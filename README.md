@@ -2,7 +2,7 @@
 (запуск BFS#main с флагом -Xmx20G)\
 \
 **Результаты:**\
-First variant
+First variant\
 bfs: 71s\
 parallel bfs: 51s\
 1.38\
@@ -14,8 +14,8 @@ parallel bfs: 34s\
 2.09\
 parallel bfs: 32s\
 2.25\
-
-Second variant
+\
+Second variant\
 bfs new: 77s\
 parallel bfs new: 37s\
 2.08\
