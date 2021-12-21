@@ -7,7 +7,7 @@ public class BFS {
     static int startNode = 0;
     public static final int n = 400;
     public static final int nodesSize = n * n * n;
-    public static final CubeGraph graph = new CubeGraph(n);
+    public static final Graph graph = new CubeGraph(n);
     public static final AtomicBoolean[] visited = new AtomicBoolean[n * n * n];
     public static final int[] depth = new int[n * n * n];
     public static Queue<Integer> frontier = new LinkedBlockingQueue<>();
