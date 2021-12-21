@@ -2,16 +2,31 @@
 (запуск BFS#main с флагом -Xmx20G)\
 \
 **Результаты:**\
-последовательный bfs: 95,753338200s\
-параллельный bfs: 31,029285400s\
-выигрыш **3.0859021394027977**\
-параллельный bfs: 33,054323600s\
-выигрыш **2.8968476063446054**\
-параллельный bfs: 35,078689300s\
-выигрыш **2.7296726334641015**\
-параллельный bfs: 31,065751600s\
-выигрыш **3.08227978620675**\
-параллельный bfs: 32,345293000s\
-выигрыш **2.960348456265337**
+First variant
+bfs: 71s\
+parallel bfs: 51s\
+1.38\
+parallel bfs: 33s\
+2.11\
+parallel bfs: 31s\
+2.27\
+parallel bfs: 34s\
+2.09\
+parallel bfs: 32s\
+2.25\
 
-![Screen](bfs_res.png "Illustration")
+Second variant
+bfs new: 77s\
+parallel bfs new: 37s\
+2.08\
+parallel bfs new: 46s\
+1.68\
+parallel bfs new: 37s\
+2.07\
+parallel bfs new: 36s\
+2.11\
+parallel bfs new: 37s\
+2.07\
+
+![Screen](bfs_res_1.png "Illustration")
+![Screen](bfs_res_2.png "Illustration")

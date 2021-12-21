@@ -15,12 +15,40 @@ public class BFS {
     CountDownLatch latch = new CountDownLatch(THREADS_NUM);
     ExecutorService threadPool = Executors.newFixedThreadPool(THREADS_NUM);
 
-    public long bfs() {
-        initVisited();
-        frontier.add(startNode);
-        visited[startNode] = new AtomicBoolean(true);
-        depth[startNode] = 0;
+    public void runFirstVariant() throws Exception {
+        long timeBfs = bfs();
+        long timeParallelBfs = parallelBfs();
+        System.out.println("First variant");
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        //bfs.printDepth();
+        timeParallelBfs = parallelBfs();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        timeParallelBfs = parallelBfs();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        timeParallelBfs = parallelBfs();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        timeParallelBfs = parallelBfs();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+    }
 
+    public void runSecondVariant() throws Exception {
+        System.out.println("Second variant");
+        long timeBfs = bfsNew();
+        long timeParallelBfs = parallelBfsNew();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        //bfs.printDepth();
+        timeParallelBfs = parallelBfsNew();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        timeParallelBfs = parallelBfsNew();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        timeParallelBfs = parallelBfsNew();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        timeParallelBfs = parallelBfsNew();
+        System.out.println((double)timeBfs/(double)timeParallelBfs);
+    }
+
+    public long bfs() {
+        init();
         long start = System.nanoTime();
         BfsStep task = new BfsStep(graph, null);
         task.run();
@@ -30,15 +58,29 @@ public class BFS {
             (new BfsStep(graph, null)).run();
         }
         long time = (System.nanoTime() - start);
-        System.out.println("bfs:" + time);
+        System.out.println("bfs:" + ((double)time/1_000_000_000.0));
+        return time;
+    }
+
+    public long bfsNew() {
+        init();
+        long start = System.nanoTime();
+        BfsStepNew task = new BfsStepNew(graph, null, startNode);
+        task.run();
+        while (!newFrontier.isEmpty()) {
+            frontier = newFrontier;
+            newFrontier = new LinkedBlockingQueue<Integer>();
+            for (int curNode : frontier) {
+                (new BfsStepNew(graph, null, curNode)).run();
+            }
+        }
+        long time = (System.nanoTime() - start);
+        System.out.println("bfs new:" + ((double)time/1_000_000_000.0));
         return time;
     }
 
     public long parallelBfs() throws Exception {
-        initVisited();
-        frontier.add(startNode);
-        visited[startNode] = new AtomicBoolean(true);
-        depth[startNode] = 0;
+        init();
         long start = System.nanoTime();
         BfsStep task = new BfsStep(graph, null);
         task.run();
@@ -52,7 +94,27 @@ public class BFS {
             latch = new CountDownLatch(THREADS_NUM);
         }
         long time = (System.nanoTime() - start);
-        System.out.println("parallel bfs:" + time);
+        System.out.println("parallel bfs:" + ((double)time/1_000_000_000.0));
+        return time;
+    }
+
+    public long parallelBfsNew() throws Exception {
+        init();
+        long start = System.nanoTime();
+        BfsStepNew task = new BfsStepNew(graph, null, startNode);
+        task.run();
+        while (!newFrontier.isEmpty()) {
+            frontier = newFrontier;
+            newFrontier = new LinkedBlockingQueue<Integer>();
+            latch = new CountDownLatch(frontier.size());
+            for (int curNode : frontier) {
+                threadPool.execute(new BfsStepNew(graph, latch, curNode));
+            }
+            latch.await();
+
+        }
+        long time = (System.nanoTime() - start);
+        System.out.println("parallel bfs new:" + ((double)time/1_000_000_000.0));
         return time;
     }
 
@@ -62,27 +124,21 @@ public class BFS {
         }
     }
 
-    private void initVisited() {
+    private void init() {
         frontier = new LinkedBlockingQueue<>();
         newFrontier = new LinkedBlockingQueue<>();
         for (int i = 0; i < nodesSize; i++) {
             visited[i] = new AtomicBoolean(false);
         }
+        frontier.add(startNode);
+        visited[startNode] = new AtomicBoolean(true);
+        depth[startNode] = 0;
     }
 
     public static void main(String[] args) throws Exception {
         BFS bfs = new BFS();
-        long timeBfs = bfs.bfs();
-        long timeParallelBfs = bfs.parallelBfs();
-        System.out.println((double)timeBfs/(double)timeParallelBfs);
-        timeParallelBfs = bfs.parallelBfs();
-        System.out.println((double)timeBfs/(double)timeParallelBfs);
-        timeParallelBfs = bfs.parallelBfs();
-        System.out.println((double)timeBfs/(double)timeParallelBfs);
-        timeParallelBfs = bfs.parallelBfs();
-        System.out.println((double)timeBfs/(double)timeParallelBfs);
-        timeParallelBfs = bfs.parallelBfs();
-        System.out.println((double)timeBfs/(double)timeParallelBfs);
+        bfs.runFirstVariant();
+        bfs.runSecondVariant();
         bfs.threadPool.shutdown();
     }
 }
